@@ -1,8 +1,10 @@
+"""Добавила функцию для обработки регистрации"""
 from django.utils import timezone
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 
 from .models import Post, Category
+from .forms import RegistrationForm
 
 
 def posts():
@@ -39,3 +41,19 @@ def category_posts(request, category_slug):
     context = {'category': category,
                'post_list': posts().filter(category=category)}
     return render(request, 'blog/category.html', context)
+
+
+def register(request):
+    """Обработка регистрации"""
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+            return redirect('login')
+    else:
+        form = RegistrationForm()
+    return render(
+        request, 'registration/registration_form.html', {'form': form}
+    )
