@@ -1,10 +1,12 @@
-"""В класс Post добавила функцию, определяющую видимость поста.
-Добавила класс Comment, чтобы связать комментарии с публикациями
+"""В модель Post добавила функцию, определяющую видимость поста.
+Добавила модель Comment, чтобы связать комментарии с публикациями
 и пользователями.
+Добавила модель для статичных страниц.
 """
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
+from django.urls import reverse
 
 User = get_user_model()
 TEXT_LENGTH = 256
@@ -113,3 +115,15 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ['created_at']
+
+
+class StaticPage(models.Model):
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True)
+    content = models.TextField()
+
+    def __str__(self):
+        return self.title
+
+    def get_absolute_url(self):
+        return reverse('static_page_detail', kwargs={'slug': self.slug})

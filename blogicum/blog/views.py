@@ -7,12 +7,13 @@
 и отображает форму редактирования.
 Добавила функции для добавления и редактирования комментариев.
 Добавила функции для удаления постов и комментариев.
+Добавила классы для отображения и редактирования страниц.
 """
 from django.utils import timezone
 
 from django.shortcuts import render, get_object_or_404, redirect
 
-from .models import Post, Category, Comment
+from .models import Post, Category, Comment, StaticPage
 from .forms import RegistrationForm, PostForm, CommentForm
 
 from django.contrib.auth.decorators import login_required
@@ -20,6 +21,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden
+from django.views.generic import DetailView
+from django.views.generic.edit import UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 def posts():
@@ -204,3 +208,21 @@ def delete_comment(request, post_id, comment_id):
         return redirect('post_detail', post_id=post_id)
 
     return render(request, 'blog/delete_comment.html', {'comment': comment})
+
+
+class StaticPageDetailView(DetailView):
+    """Отображение страниц"""
+    model = StaticPage
+    template_name = 'pages/static_page_detail.html'
+    context_object_name = 'page'
+
+
+class StaticPageUpdateView(LoginRequiredMixin, UpdateView):
+    """Редактирование страниц"""
+    model = StaticPage
+    fields = ['title', 'content']
+    template_name = 'pages/static_page_form.html'
+    context_object_name = 'page'
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()

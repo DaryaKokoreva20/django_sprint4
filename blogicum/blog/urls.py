@@ -2,10 +2,10 @@
 Добавила пути для страницы профиля, редактирования профиля и изменения пароля.
 Добавила пути для создания постов, редактирования и удаления.
 Добавила пути для комментариев и их удаления.
+Добавила пути для статичных страниц.
 """
 from django.urls import path
-from .views import register
-
+from .views import register, StaticPageDetailView, StaticPageUpdateView
 from . import views
 
 app_name = 'blog'
@@ -27,4 +27,8 @@ urlpatterns = [
     path('<int:post_id>/delete/', views.delete_post, name='delete_post'),
     path('<int:post_id>/delete_comment/<int:comment_id>/',
          views.delete_comment, name='delete_comment'),
+    path('pages/<slug:slug>/', StaticPageDetailView.as_view(),
+         name='static_page_detail'),
+    path('pages/<slug:slug>/edit/', StaticPageUpdateView.as_view(),
+         name='static_page_edit'),
 ]
