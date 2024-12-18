@@ -1,4 +1,6 @@
-'''Добавила настройку для кастомной страницы CSRF. '''
+"""Добавила настройку для кастомной страницы CSRF.
+Добавила настройки для отправки писем.
+"""
 
 from pathlib import Path
 import os
@@ -130,3 +132,6 @@ CSRF_FAILURE_VIEW = 'pages.views.csrf_failure'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = BASE_DIR / 'sent_emails' 
