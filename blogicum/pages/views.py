@@ -19,7 +19,7 @@ class Rules(TemplateView):
 
 
 def csrf_failure(request, reason=""):
-    return render(request, 'pages/403_csrf.html', status=403)
+    return render(request, 'pages/403csrf.html', status=403)
 
 
 def page_not_found(request, exception):
