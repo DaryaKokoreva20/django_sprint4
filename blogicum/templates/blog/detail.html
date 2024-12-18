@@ -1,4 +1,6 @@
-<!--Добавила код для отображения изображения-->
+<!--Добавила код для отображения изображения.
+Добавила отображение комментариев.
+-->
 {% extends "base.html" %}
 {% block title %}
 {{ post.title }} | {% if post.location and post.location.is_published %}{{ post.location.name }} |{% endif %} {{ post.pub_date|date:"d E Y" }}
@@ -14,6 +16,28 @@
     <p>{{ post.text|linebreaksbr }}</p>
     {% if user == post.author %}
       <a href="{% url 'post_edit' post.id %}" class="btn btn-secondary">Редактировать</a>
+    {% endif %}
+    <h2>Комментарии ({{ post.comments.count }})</h2>
+    <ul>
+      {% for comment in post.comments.all|dictsort:"created_at" %}
+        <li>
+          <strong>{{ comment.author }}</strong> ({{ comment.created_at }}): {{ comment.text }}
+          {% if comment.author == user %}
+            <a href="{% url 'edit_comment' post.id comment.id %}">Редактировать</a>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+
+    {% if user.is_authenticated %}
+      <h3>Добавить комментарий</h3>
+      <form method="post" action="{% url 'add_comment' post.id %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Отправить</button>
+      </form>
+    {% else %}
+      <p><a href="{% url 'login' %}">Войдите</a>, чтобы оставить комментарий.</p>
     {% endif %}
   </article> 
 {% endblock %}

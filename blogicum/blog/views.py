@@ -3,15 +3,16 @@
 редактирования профиля, изменения пароля.
 Добавила функцию представления для создания постов.
 В функцию profile добавила условие, что только автору видны отложенные посты.
-Добавила функцию post_edit, которая проверяет права пользователя 
+Добавила функцию post_edit, которая проверяет права пользователя
 и отображает форму редактирования.
+Добавила функции для добавления и редактирования комментариев.
 """
 from django.utils import timezone
 
 from django.shortcuts import render, get_object_or_404, redirect
 
-from .models import Post, Category
-from .forms import RegistrationForm, PostForm
+from .models import Post, Category, Comment
+from .forms import RegistrationForm, PostForm, CommentForm
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -132,3 +133,42 @@ def post_edit(request, post_id):
         form = PostForm(instance=post)
 
     return render(request, 'blog/create.html', {'form': form, 'is_edit': True})
+
+
+@login_required
+def add_comment(request, post_id):
+    """Добавление комментариев"""
+    post = get_object_or_404(Post, id=post_id)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            return redirect('post_detail', post_id=post.id)
+    else:
+        form = CommentForm()
+    return render(
+        request, 'blog/add_comment.html', {'form': form, 'post': post}
+    )
+
+
+@login_required
+def edit_comment(request, post_id, comment_id):
+    """Редактирование комментариев"""
+    comment = get_object_or_404(Comment, id=comment_id, post_id=post_id)
+    if comment.author != request.user:
+        return redirect('post_detail', post_id=post_id)
+
+    if request.method == 'POST':
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            return redirect('post_detail', post_id=post_id)
+    else:
+        form = CommentForm(instance=comment)
+
+    return render(
+        request, 'blog/edit_comment.html', {'form': form, 'post': comment.post}
+    )
