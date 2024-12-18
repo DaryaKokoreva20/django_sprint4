@@ -12,5 +12,8 @@
     {% endif %}
     <h3>{{ post.title }}</h3>
     <p>{{ post.text|linebreaksbr }}</p>
+    {% if user == post.author %}
+      <a href="{% url 'post_edit' post.id %}" class="btn btn-secondary">Редактировать</a>
+    {% endif %}
   </article> 
 {% endblock %}

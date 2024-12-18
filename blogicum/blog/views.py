@@ -2,8 +2,9 @@
 Добавила функции отображения страницы профиля,
 редактирования профиля, изменения пароля.
 Добавила функцию представления для создания постов.
-В функцию profile добавила условие, что только автору видны отложенные посты
-
+В функцию profile добавила условие, что только автору видны отложенные посты.
+Добавила функцию post_edit, которая проверяет права пользователя 
+и отображает форму редактирования.
 """
 from django.utils import timezone
 
@@ -113,3 +114,21 @@ def post_create(request):
     else:
         form = PostForm()
     return render(request, 'posts/post_create.html', {'form': form})
+
+
+@login_required
+def post_edit(request, post_id):
+    """Проверяет права пользователя и отображает форму редактирования"""
+    post = get_object_or_404(Post, id=post_id)
+    if post.author != request.user:
+        return redirect('post_detail', post_id=post.id)
+
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect('post_detail', post_id=post.id)
+    else:
+        form = PostForm(instance=post)
+
+    return render(request, 'blog/create.html', {'form': form, 'is_edit': True})

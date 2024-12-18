@@ -1,5 +1,6 @@
 """Добавила путь для регистрации.
 Добавила пути для страницы профиля, редактирования профиля и изменения пароля.
+Добавила пути для создания постов, редактирования
 """
 from django.urls import path
 from .views import register
@@ -17,4 +18,6 @@ urlpatterns = [
     path('profile/<username>/', views.profile, name='profile'),
     path('edit_profile/', views.edit_profile, name='edit_profile'),
     path('change_password/', views.change_password, name='change_password'),
+    path('create/', views.post_create, name='post_create'),
+    path('<int:post_id>/edit/', views.post_edit, name='post_edit'),
 ]
