@@ -1,16 +1,21 @@
-'''Создала обработчик csrf_failure и обработчики для ошибок 404 и 500'''
+"""Создала обработчик csrf_failure и обработчики для ошибок 404 и 500.
+Подключила шаблонов кастомных страниц для ошибок с помощью view-классов.
+"""
 
 from django.shortcuts import render
+from django.views.generic import TemplateView
 
 
-def about(request):
-    template = 'pages/about.html'
-    return render(request, template)
+class About(TemplateView):
+    """view-класс для страницы about"""
+
+    template_name = 'pages/about.html'
 
 
-def rules(request):
-    template = 'pages/rules.html'
-    return render(request, template)
+class Rules(TemplateView):
+    """view-класс для страницы rules"""
+
+    template_name = 'pages/rules.html'
 
 
 def csrf_failure(request, reason=""):

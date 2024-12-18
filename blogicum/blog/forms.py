@@ -2,42 +2,32 @@
 Создала форму для комментариев.
 """
 from django import forms
-from .models import Post
-from django.contrib.auth.models import User
-from .models import Comment
+
+from .models import Post, User, Comment
 
 
-class CommentForm(forms.ModelForm):
-    class Meta:
-        model = Comment
-        fields = ['text']
-
-
-class PostForm(forms.ModelForm):
-    class Meta:
-        model = Post
-        fields = '__all__'
-        widgets = {
-            'publish_date': forms.DateTimeInput(
-                attrs={'type': 'datetime-local'}
-            ),
-        }
-
-
-class RegistrationForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput, label="Password")
-    confirm_password = forms.CharField(
-        widget=forms.PasswordInput, label="Confirm Password"
-    )
+class UserForm(forms.ModelForm):
+    """Форма для создания и редактирования профиля пользователя"""
 
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'password']
+        fields = ('first_name', 'last_name', 'email', 'username')
 
-    def clean(self):
-        cleaned_data = super().clean()
-        password = cleaned_data.get("password")
-        confirm_password = cleaned_data.get("confirm_password")
-        if password != confirm_password:
-            raise forms.ValidationError("Passwords do not match!")
-        return cleaned_data
+
+class PostForm(forms.ModelForm):
+    """Форма для создания и редактирования публикаций"""
+
+    class Meta:
+        model = Post
+        exclude = ('author',)
+        widgets = {
+            'pub_date': forms.DateInput(attrs={'type': 'datetime-local'})
+        }
+
+
+class CommentForm(forms.ModelForm):
+    """Форма для добавления комментариев к публикациям"""
+
+    class Meta:
+        model = Comment
+        fields = ('text',)
