@@ -1,10 +1,17 @@
-"""Добавила функцию для обработки регистрации"""
+"""Добавила функцию для обработки регистрации.
+Добавила функции отображения страницы профиля,
+редактирования профиля, изменения пароля.
+
+"""
 from django.utils import timezone
 
 from django.shortcuts import render, get_object_or_404, redirect
 
 from .models import Post, Category
 from .forms import RegistrationForm
+
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
 
 def posts():
@@ -57,3 +64,26 @@ def register(request):
     return render(
         request, 'registration/registration_form.html', {'form': form}
     )
+
+
+def profile(request, username):
+    """Страница профиля"""
+    user = get_object_or_404(User, username=username)
+    posts = Post.objects.filter(author=user)
+    return render(request, 'profile.html', {'user': user, 'posts': posts})
+
+
+@login_required
+def edit_profile(request):
+    """Страница редактирования профиля (доступна только владельцу аккаунта)"""
+    if request.method == 'POST':
+        pass
+    return render(request, 'edit_profile.html')
+
+
+@login_required
+def change_password(request):
+    """Страница изменения пароля (доступна только владельцу аккаунта)"""
+    if request.method == 'POST':
+        pass
+    return render(request, 'change_password.html')

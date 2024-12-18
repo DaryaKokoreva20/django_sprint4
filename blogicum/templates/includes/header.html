@@ -1,3 +1,5 @@
+<!-- Добавила кнопки для регистрации и входа-->
+<!-- Добавила кнопки для редактирования профиля и изменения пароля-->
 {% load static %}
 <header>
   <nav class="navbar navbar-light" style="background-color: lightskyblue">
@@ -23,16 +25,29 @@
               Наши правила
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link {% if view_name == 'blog:register' %} active {% endif %}" href="{% url 'blog:register' %}">
-              Регистрация
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link {% if request.path == '/login/' %} active {% endif %}" href="{% url 'login' %}">
-              Вход
-            </a>
-          </li>
+          {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link {% if view_name == 'blog:edit_profile' %} active {% endif %}" href="{% url 'blog:edit_profile' %}">
+                Редактировать профиль
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if view_name == 'blog:change_password' %} active {% endif %}" href="{% url 'blog:change_password' %}">
+                Изменить пароль
+              </a>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link {% if view_name == 'blog:register' %} active {% endif %}" href="{% url 'blog:register' %}">
+                Регистрация
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.path == '/login/' %} active {% endif %}" href="{% url 'login' %}">
+                Вход
+              </a>
+            </li>
+          {% endif %}
         </ul>
       {% endwith %}      
     </div>
