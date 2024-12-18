@@ -1,6 +1,8 @@
 """Добавила функцию для обработки регистрации.
 Добавила функции отображения страницы профиля,
 редактирования профиля, изменения пароля.
+Добавила функцию представления для создания постов.
+В функцию profile добавила условие, что только автору видны отложенные посты
 
 """
 from django.utils import timezone
@@ -8,10 +10,12 @@ from django.utils import timezone
 from django.shortcuts import render, get_object_or_404, redirect
 
 from .models import Post, Category
-from .forms import RegistrationForm
+from .forms import RegistrationForm, PostForm
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
 
 
 def posts():
@@ -69,8 +73,15 @@ def register(request):
 def profile(request, username):
     """Страница профиля"""
     user = get_object_or_404(User, username=username)
-    posts = Post.objects.filter(author=user)
-    return render(request, 'profile.html', {'user': user, 'posts': posts})
+    if request.user == user:
+        posts = user.posts.all()  # Показываем все посты автору
+    else:
+        posts = user.posts.filter(
+            is_published=True, publish_date__lte=timezone.now()
+        )
+    return render(
+        request, 'users/profile.html', {'user': user, 'posts': posts}
+    )
 
 
 @login_required
@@ -87,3 +98,18 @@ def change_password(request):
     if request.method == 'POST':
         pass
     return render(request, 'change_password.html')
+
+
+@login_required
+def post_create(request):
+    """Представление для создания постов"""
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect('profile', username=request.user.username)
+    else:
+        form = PostForm()
+    return render(request, 'posts/post_create.html', {'form': form})

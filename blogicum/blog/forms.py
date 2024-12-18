@@ -8,6 +8,11 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = '__all__'
+        widgets = {
+            'publish_date': forms.DateTimeInput(
+                attrs={'type': 'datetime-local'}
+            ),
+        }
 
 
 class RegistrationForm(forms.ModelForm):

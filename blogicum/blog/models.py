@@ -1,5 +1,7 @@
+"""В класс Post добавила функцию, определяющую видимость поста"""
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils import timezone
 
 User = get_user_model()
 TEXT_LENGTH = 256
@@ -82,6 +84,10 @@ class Post(BaseModel):
         verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
         ordering = ['-pub_date']
+
+    def is_visible(self):
+        """Определяет, виден ли пост."""
+        return self.is_published and self.publish_date <= timezone.now()
 
     def __str__(self):
         return self.title
