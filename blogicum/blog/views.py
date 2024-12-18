@@ -6,6 +6,7 @@
 Добавила функцию post_edit, которая проверяет права пользователя
 и отображает форму редактирования.
 Добавила функции для добавления и редактирования комментариев.
+Добавила функции для удаления постов и комментариев.
 """
 from django.utils import timezone
 
@@ -18,6 +19,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseForbidden
 
 
 def posts():
@@ -172,3 +174,33 @@ def edit_comment(request, post_id, comment_id):
     return render(
         request, 'blog/edit_comment.html', {'form': form, 'post': comment.post}
     )
+
+
+@login_required
+def delete_post(request, post_id):
+    """Удаление поста"""
+    post = get_object_or_404(Post, id=post_id)
+
+    if post.author != request.user:
+        return HttpResponseForbidden("Вы не можете удалить эту публикацию.")
+
+    if request.method == 'POST':
+        post.delete()
+        return redirect('profile', username=request.user.username)
+
+    return render(request, 'blog/delete_post.html', {'post': post})
+
+
+@login_required
+def delete_comment(request, post_id, comment_id):
+    """Удаление комментария"""
+    comment = get_object_or_404(Comment, id=comment_id, post_id=post_id)
+
+    if comment.author != request.user:
+        return HttpResponseForbidden("Вы не можете удалить этот комментарий.")
+
+    if request.method == 'POST':
+        comment.delete()
+        return redirect('post_detail', post_id=post_id)
+
+    return render(request, 'blog/delete_comment.html', {'comment': comment})

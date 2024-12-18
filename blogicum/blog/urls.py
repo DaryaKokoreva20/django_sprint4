@@ -1,7 +1,7 @@
 """Добавила путь для регистрации.
 Добавила пути для страницы профиля, редактирования профиля и изменения пароля.
-Добавила пути для создания постов, редактирования.
-Добавила пути для комментариев.
+Добавила пути для создания постов, редактирования и удаления.
+Добавила пути для комментариев и их удаления.
 """
 from django.urls import path
 from .views import register
@@ -24,4 +24,7 @@ urlpatterns = [
     path('<int:post_id>/comment/', views.add_comment, name='add_comment'),
     path('<int:post_id>/edit_comment/<int:comment_id>/',
          views.edit_comment, name='edit_comment'),
+    path('<int:post_id>/delete/', views.delete_post, name='delete_post'),
+    path('<int:post_id>/delete_comment/<int:comment_id>/',
+         views.delete_comment, name='delete_comment'),
 ]

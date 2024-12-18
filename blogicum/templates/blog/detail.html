@@ -1,5 +1,7 @@
 <!--Добавила код для отображения изображения.
 Добавила отображение комментариев.
+Добавила кнопку удаления публикации.
+Добавила кнопку удаления комментария.
 -->
 {% extends "base.html" %}
 {% block title %}
@@ -17,6 +19,12 @@
     {% if user == post.author %}
       <a href="{% url 'post_edit' post.id %}" class="btn btn-secondary">Редактировать</a>
     {% endif %}
+    {% if post.author == user %}
+    <form method="post" action="{% url 'delete_post' post.id %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Удалить публикацию</button>
+    </form>
+  {% endif %}
     <h2>Комментарии ({{ post.comments.count }})</h2>
     <ul>
       {% for comment in post.comments.all|dictsort:"created_at" %}
@@ -24,6 +32,12 @@
           <strong>{{ comment.author }}</strong> ({{ comment.created_at }}): {{ comment.text }}
           {% if comment.author == user %}
             <a href="{% url 'edit_comment' post.id comment.id %}">Редактировать</a>
+          {% endif %}
+          {% if comment.author == user %}
+            <form method="post" action="{% url 'delete_comment' post.id comment.id %}" style="display: inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+            </form>
           {% endif %}
         </li>
       {% endfor %}
